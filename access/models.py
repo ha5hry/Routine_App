@@ -29,7 +29,7 @@ class Skill(models.Model):
     skill = models.CharField(_('Skills'),max_length=50, choices= skill_choice)
 
 class Follow(models.Model):
-        profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name= 'profile_followers')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name= 'profile_follow')
     follower = models.IntegerField(default=0)
     following = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
