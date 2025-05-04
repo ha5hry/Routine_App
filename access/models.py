@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext as _
+from .manager import UserManager
 
 # Create your models here.
 class Profile(AbstractUser):
@@ -15,9 +16,10 @@ class Profile(AbstractUser):
     phone_number = models.CharField(_("Phone Number"), max_length=15, unique=True, blank=True, null= True )
     date_joined = models.DateField(_("Date Joined"), auto_now_add=True)
 
-
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
+
+    objects = UserManager()
 
 class Skill(models.Model):
     skill_choice = (
