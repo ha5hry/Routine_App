@@ -21,10 +21,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     
 
 class SkillSerializer(serializers.ModelSerializer):
-    model = Skill
-    fields = ['skill']
 
-    def create(self, request):
-         validated_data = self.context.get('request')
+    class Meta:
+        model = Skill
+        fields = ['skill']
+
+    def create(self, validated_data):
+         request = self.context.get('request')
          validated_data['profile'] = request.user
          return super().create(validated_data)
