@@ -14,7 +14,7 @@ class ProfileUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("email", "password1", "password2", "phone_number"),
+            "fields": ("username","email", "password1", "password2", "phone_number"),
         }),
     )
     readonly_fields = ('date_joined',)

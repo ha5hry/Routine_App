@@ -1,8 +1,23 @@
 import requests
 from getpass import getpass
-endpoint = 'http://127.0.0.1:8000/api/register/'
-email = input("Input your email?\n")
-password = getpass("Input your password?\n")
-data = {'username': 'firstuser', 'email':email, 'first_name': 'First', 'last_name': 'person', 'gender':'m', 'password': password}
-register_endpoint = requests.post(endpoint, json=data)
-print(register_endpoint.json())
+def register_user():
+    endpoint = 'http://127.0.0.1:8000/api/register/'
+    email = input("Input your email?\n")
+    password = getpass("Input your password?\n")
+    password2 = getpass("Confirm your password?\n")
+    data = {'username': 'thirduser', 'email':email, 'first_name': 'Second', 'last_name': 'person', 'gender':'m', 'password': password, 'password2': password2}
+    register_endpoints= requests.post(endpoint, json=data)
+    endpoint_response = register_endpoints.json()
+    print(endpoint_response)
+    return endpoint_response
+
+
+def add_skill(request, header):
+    endpoint = 'http://127.0.0.1:8000/api/skill/'
+    data = {'skill':'product_manager'}
+    skill_endpoint = requests.post(endpoint, json=data, headers=header)
+    endpoint_response = skill_endpoint.json()
+    print(endpoint_response)
+    return endpoint_response
+if __name__ == '__main__':
+    register_user()
