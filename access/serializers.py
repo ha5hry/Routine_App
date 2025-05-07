@@ -14,10 +14,19 @@ class RegisterSerializer(serializers.ModelSerializer):
                 raise ValueError("Your password does not match")
             return data
         
-    def create(self, validated_data):
+    def create(self,request, validated_data):
             validated_data.pop('password2')
             user = Profile.objects.create_user(**validated_data)
             return user
+
+class ProfileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+          model = Profile
+          fields = ['pfp', 'username', 'full_name', 'email', 'phone_number' , 'bio','birthday', 'gender',  ]
+          extra_kwargs = {'password':{'write_only':True }}
+
+    
     
 
 class SkillSerializer(serializers.ModelSerializer):
@@ -30,3 +39,14 @@ class SkillSerializer(serializers.ModelSerializer):
          request = self.context.get('request')
          validated_data['profile'] = request.user
          return super().create(validated_data)
+    
+class FollowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+          model = Follow
+          fields = ['profile',  'follower', 'following'] 
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['profile'] = request.user
+        return super().create(validated_data)

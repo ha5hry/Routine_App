@@ -17,8 +17,9 @@ def login():
         }
     return header
 
-header = login()
-add_skill(requests, header= header)
+if __name__ == '__main__':
+    header = login()
+    add_skill(requests, header= header)
 
 
     

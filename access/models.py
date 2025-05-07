@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
+
 from django.utils.translation import gettext as _
 from .manager import UserManager
 
@@ -20,6 +21,9 @@ class Profile(AbstractUser):
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
+    
+    def full_name(self):
+        return self.get_full_name()
 
 class Skill(models.Model):
     skill_choice = (
@@ -32,6 +36,6 @@ class Skill(models.Model):
 
 class Follow(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name= 'profile_follow')
-    follower = models.IntegerField(default=0)
-    following = models.IntegerField(default=0)
+    follower = models.IntegerField(default=0, null=True)
+    following = models.IntegerField(default=0, null=True)
     updated_at = models.DateTimeField(auto_now=True)

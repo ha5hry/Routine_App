@@ -23,5 +23,5 @@ class ProfileUserAdmin(UserAdmin):
     ordering = ("email",)
 
 admin.site.register(Profile, ProfileUserAdmin)
-
 admin.site.register(Skill)
+admin.site.register(Follow)

@@ -5,16 +5,16 @@ def register_user():
     email = input("Input your email?\n")
     password = getpass("Input your password?\n")
     password2 = getpass("Confirm your password?\n")
-    data = {'username': 'thirduser', 'email':email, 'first_name': 'Second', 'last_name': 'person', 'gender':'m', 'password': password, 'password2': password2}
+    data = {'username': 'fourthuser', 'email':email, 'first_name': 'Fourth', 'last_name': 'person', 'gender':'f', 'password': password, 'password2': password2}
     register_endpoints= requests.post(endpoint, json=data)
     endpoint_response = register_endpoints.json()
     print(endpoint_response)
     return endpoint_response
 
 
-def add_skill(request, header):
+def add_skill( header):
     endpoint = 'http://127.0.0.1:8000/api/skill/'
-    data = {'skill':'product_manager'}
+    data = {'skill':'backend_development'}
     skill_endpoint = requests.post(endpoint, json=data, headers=header)
     endpoint_response = skill_endpoint.json()
     print(endpoint_response)
