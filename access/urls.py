@@ -3,8 +3,9 @@ from . import views
 
 urlpatterns = [
     path('register/', views.RegisterApiView.as_view(), name = 'register_user'),
-    path('profile/<str:username>/', views.ProfileApiView.as_view(), name = 'profile'),
+    path('myprofile/', views.MyProfileApiView.as_view(), name = 'myprofile'),
     path('skill/', views.SkillApiView.as_view(), name='skill'),
-    path('follow/', views.FollowApiView.as_view(), name='follow'),
+    path('profile/<str:username>/', views.ProfileApiView.as_view(), name = 'profile'),
+    path('profile/<str:username>/follow/', views.FollowApiView.as_view(), name='follow'),
     path('unfollow/', views.FollowApiView.as_view(), name='unfollow'),
 ]

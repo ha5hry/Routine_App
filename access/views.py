@@ -27,7 +27,14 @@ class SkillApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+class MyProfileApiView(APIView):
+    def get(self, request):
+        instance = Follow.objects.all()
+        serializer = FollowSerializer(instance, many = True)
+        return Response(serializer.data)
+
 class FollowApiView(APIView):
     def post(self, request):
         
@@ -37,6 +44,14 @@ class FollowApiView(APIView):
         return Response('let seee')
         
     def get(self, request):
+        if request.data.get('follow', 'follow') == 'follow':
+            instance = Follow.objects.get(profile = request.user)
+            instance.following =+ 1
+            instance.save()
+        elif request.data.get('follow') == 'unfollow':
+            instance = Follow.objects.get(profile = request.user)
+            instance.following =- 1
+            instance.save()
         instance = Follow.objects.all()
         serializer = FollowSerializer(instance, many = True)
         return Response(serializer.data)
