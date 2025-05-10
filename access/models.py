@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
-
+from django.core.validators import MinValueValidator
 from django.utils.translation import gettext as _
 from .manager import UserManager
 
@@ -39,3 +39,10 @@ class Follow(models.Model):
     follower = models.IntegerField(default=0, null=True)
     following = models.IntegerField(default=0, null=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def username(self):
+        return self.profile.username
+    
+    
+    # def __str__(self):
+    #     return self.username()

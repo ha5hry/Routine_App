@@ -5,7 +5,7 @@ def register_user():
     email = input("Input your email?\n")
     password = getpass("Input your password?\n")
     password2 = getpass("Confirm your password?\n")
-    data = {'username': 'fourthuser', 'email':email, 'first_name': 'Fourth', 'last_name': 'person', 'gender':'f', 'password': password, 'password2': password2}
+    data = {'username': 'seconduser', 'email':email, 'first_name': 'Second', 'last_name': 'person', 'gender':'m', 'password': password, 'password2': password2}
     register_endpoints= requests.post(endpoint, json=data)
     endpoint_response = register_endpoints.json()
     print(endpoint_response)
