@@ -39,7 +39,16 @@ class MyProfileApiView(APIView):
 
 class FollowApiView(APIView):
     def post(self, request, username):
-        pass
+        # user_following is to create an object in Follow Model for the current logged-in User
+        user_following = Follow.objects.create(user_following = request.user)
+        # user_followed this get the user being followed by the logged-in user through the username in the URL
+        #  to get the profile object fro the Profile Model
+        user_followed = Profile.objects.get(username = username)
+        
+        user_following.user_followed = user_followed
+        user_following.save()
+
+        return Response('Successful')
         
     def get(self, request, username):
         instance = Follow.objects.all()

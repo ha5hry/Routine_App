@@ -25,6 +25,6 @@ class ProfileUserAdmin(UserAdmin):
 admin.site.register(Profile, ProfileUserAdmin)
 admin.site.register(Skill)
 
-# class FollowAdmin(admin.ModelAdmin):
-#     list_display = ['username', 'follower', 'following']
-# admin.site.register(Follow, FollowAdmin)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = [ 'user_following', 'user_followed']
+admin.site.register(Follow, FollowAdmin)
