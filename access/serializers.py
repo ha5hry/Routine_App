@@ -41,12 +41,17 @@ class SkillSerializer(serializers.ModelSerializer):
          return super().create(validated_data)
     
 class FollowSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField(read_only = True)
 
+    def get_username(self, obj):
+         return obj.user_following.username 
     class Meta:
           model = Follow
-          fields = ['username',  'follower', 'following'] 
+          fields = [ 'username','user_following', 'user_followed'] 
 
-    def create(self, validated_data):
-        request = self.context.get('request')
-        validated_data['profile'] = request.user
-        return super().create(validated_data)
+
+
+    # def create(self, validated_data):
+    #     request = self.context.get('request')
+    #     validated_data['profile'] = request.user
+    #     return super().create(validated_data)

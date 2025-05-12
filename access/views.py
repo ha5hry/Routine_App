@@ -39,13 +39,24 @@ class MyProfileApiView(APIView):
 
 class FollowApiView(APIView):
     def post(self, request, username):
+        # all_user_following is to get all the Follow model object of where their user_following fields is the object of the current logged-in user
+        all_user_following = Follow.objects.filter(user_following = request.user)
+        # get_user_followed is to get the user being followed in the profile model 
+        get_user_followed = Profile.objects.get(username = username)
+        # this FOR block is to loop on each objects from the 'all_user_following' model 
+        for each_user_following in all_user_following:
+            # Thus IF block is to check if the current logged-in user hasn't followed the profile about to be followed, to avoid duplication
+            if each_user_following.user_following == request.user and each_user_following.user_followed == get_user_followed:
+                #If TRUE the it returns the Response below, but if FALSE it exit the block and continue with the remaining lines of code
+                return Response("Profile has been followed by this user")
         # user_following is to create an object in Follow Model for the current logged-in User
         user_following = Follow.objects.create(user_following = request.user)
-        # user_followed this get the user being followed by the logged-in user through the username in the URL
-        #  to get the profile object fro the Profile Model
+        # user_followed this get the user being followed by the logged-in user through the username in the URL to get the profile object fro the Profile Model
         user_followed = Profile.objects.get(username = username)
-        
+
+        # assign the profile being followed to the 'user_followed' field in the Follow object
         user_following.user_followed = user_followed
+
         user_following.save()
 
         return Response('Successful')

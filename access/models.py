@@ -39,6 +39,9 @@ class Follow(models.Model):
     user_followed = models.ForeignKey(Profile, on_delete=models.CASCADE, blank= True, null=True, editable=False , related_name='user_followed_profile')
     updated_at = models.DateTimeField(auto_now_add=True)
 
+
+    
+
     # def username(self):
     #     return self.user_following.username
     

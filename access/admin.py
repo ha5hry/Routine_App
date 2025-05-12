@@ -26,5 +26,6 @@ admin.site.register(Profile, ProfileUserAdmin)
 admin.site.register(Skill)
 
 class FollowAdmin(admin.ModelAdmin):
-    list_display = [ 'user_following', 'user_followed']
+    list_display = [ 'pk', 'user_following', 'user_followed']
+    readonly_fields = [ 'user_following', 'user_followed']
 admin.site.register(Follow, FollowAdmin)
