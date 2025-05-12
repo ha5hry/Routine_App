@@ -39,9 +39,12 @@ class MyProfileApiView(APIView):
 
 class FollowApiView(APIView):
     def post(self, request, username):
+        # This IF bock checks for the keyword 'follow' is having the word 'follow' passed in the request data to the endpoint
         if request.data.get('follow') == 'follow':
             # all_user_following is to get all the Follow model object of where their user_following fields is the object of the current logged-in user
             all_user_following = Follow.objects.filter(user_following = request.user)
+            count_f = Follow.objects.filter(user_following = request.user).count()
+            print("this is the following count" ,count_f)
             # get_user_followed is to get the user being followed in the profile model 
             get_user_followed = Profile.objects.get(username = username)
             # this FOR block is to loop on each objects from the 'all_user_following' model 
@@ -57,7 +60,8 @@ class FollowApiView(APIView):
             # assign the profile being followed to the 'user_followed' field in the Follow object
             user_following.user_followed = user_followed
             user_following.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response('hola', status=status.HTTP_201_CREATED)
+        # This IF bock checks for the keyword 'follow' is having the word 'unfollow' passed in the request data to the endpoint
         elif request.data.get('follow') == 'unfollow':
             # user_followed this get the user being followed by the logged-in user through the username in the URL to get the profile object fro the Profile Model
             user_followed = Profile.objects.get(username = username)
@@ -67,6 +71,9 @@ class FollowApiView(APIView):
             return Response('Deleted')
         
     def get(self, request, username):
+        following_count = Follow.objects.filter(user_following = request.user).count()
+        followers_count = Follow.objects.filter(user_followed = request.user).count()
+        print(following_count, followers_count)
         instance = Follow.objects.all()
         serializer = FollowSerializer(instance, many = True)
         return Response(serializer.data)
