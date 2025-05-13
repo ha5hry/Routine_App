@@ -42,12 +42,21 @@ class SkillSerializer(serializers.ModelSerializer):
     
 class FollowSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField(read_only = True)
-
+    following_count = serializers.SerializerMethodField(read_only = True)
+    followers_count = serializers.SerializerMethodField(read_only = True)
     def get_username(self, obj):
          return obj.user_following.username 
+    
+    def get_following_count( self, obj):
+        request = self.context.get('request')
+        return Follow.objects.filter(user_following = request.user).count()
+    
+    def get_followers_count(self, obj):
+        request = self.context.get('request')
+        return Follow.objects.filter(user_followed = request.user).count()
     class Meta:
           model = Follow
-          fields = [ 'username','user_following', 'user_followed'] 
+          fields = [ 'username', 'following_count', 'followers_count', 'user_following', 'user_followed'] 
 
 
 

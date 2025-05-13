@@ -75,6 +75,6 @@ class FollowApiView(APIView):
         followers_count = Follow.objects.filter(user_followed = request.user).count()
         print(following_count, followers_count)
         instance = Follow.objects.all()
-        serializer = FollowSerializer(instance, many = True)
+        serializer = FollowSerializer(instance, many = True, context = {'request': request})
         return Response(serializer.data)
 
