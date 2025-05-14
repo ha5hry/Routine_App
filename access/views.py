@@ -18,9 +18,10 @@ class ProfileApiView(APIView):
 
     def get(self, request, username):
         instance = Profile.objects.get(username = username)
-        user_follow_obj, created = Follow.objects.get_or_create(profile = request.user)
+        no_of_following= Follow.objects.filter(user_following = request.user).count()
+        no_of_followers = Follow.objects.filter(user_followed = request.user).count()
         serializer = ProfileSerializer(instance)
-        return Response(serializer.data)
+        return Response({'profile_data':serializer.data, 'following_data': no_of_following, 'followers_data': no_of_followers})
 class SkillApiView(APIView):
     def post(self, request):
         serializer = SkillSerializer(data = request.data, context = {'request': request})

@@ -26,8 +26,6 @@ class ProfileSerializer(serializers.ModelSerializer):
           fields = ['pfp', 'username', 'full_name', 'email', 'phone_number' , 'bio','birthday', 'gender',  ]
           extra_kwargs = {'password':{'write_only':True }}
 
-    
-    
 
 class SkillSerializer(serializers.ModelSerializer):
 
