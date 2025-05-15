@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Profile, Skill, Follow
 from .serializers import RegisterSerializer, SkillSerializer, ProfileSerializer, FollowSerializer
+from common import permissions
 
 # Create your views here.
 class RegisterApiView(APIView):
@@ -14,14 +15,7 @@ class RegisterApiView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class ProfileApiView(APIView):
 
-    def get(self, request, username):
-        instance = Profile.objects.get(username = username)
-        no_of_following= Follow.objects.filter(user_following = request.user).count()
-        no_of_followers = Follow.objects.filter(user_followed = request.user).count()
-        serializer = ProfileSerializer(instance)
-        return Response({'profile_data':serializer.data, 'following_data': no_of_following, 'followers_data': no_of_followers})
 class SkillApiView(APIView):
     def post(self, request):
         serializer = SkillSerializer(data = request.data, context = {'request': request})
@@ -29,16 +23,33 @@ class SkillApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
+    
+class ProfileApiView(APIView):
+    permission_classes =[permissions.AccessPermission]
+    def get(self, request, username):
+        instance = Profile.objects.get(username = username)
+        no_of_following= Follow.objects.filter(user_following = request.user).count()
+        no_of_followers = Follow.objects.filter(user_followed = request.user).count()
+        serializer = ProfileSerializer(instance)
+        return Response({'profile_data':serializer.data, 'following_data': no_of_following, 'followers_data': no_of_followers})
 
-
-class MyProfileApiView(APIView):
-    def get(self, request):
-        # user_following = Profile.objects.get(profile = request.user)
-        instance, created = Follow.objects.get_or_create(profile = request.user)
-        serializer = FollowSerializer(instance)
-        return Response(serializer.data)
-
+class EditProfileApiView(APIView):
+    permission_classes = [permissions.AccessPermission]
+    def put(self, request):
+        instance = Profile.objects.get(username = request.user.username)
+        serializer = ProfileSerializer(instance, request.data, context = {'request':request})
+        if serializer.is_valid():
+            serializer.save()
+        return Response ('Profile updated', status= status.HTTP_202_ACCEPTED)
+    def patch(self, request):
+        instance = Profile.objects.get(username = request.user.username)
+        serializer = ProfileSerializer(instance, request.data, context = {'request':request}, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response ('Profile updated', status= status.HTTP_202_ACCEPTED)
+        return Response (serializer.errors)
 class FollowApiView(APIView):
+    permission_classes =[permissions.AccessPermission]
     def post(self, request, username):
         # This IF bock checks for the keyword 'follow' is having the word 'follow' passed in the request data to the endpoint
         if request.data.get('follow') == 'follow':
