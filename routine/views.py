@@ -12,3 +12,7 @@ class RoutineApiView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+
+class TodoApiView(APIView):
+    def post(self, request):
+        pass

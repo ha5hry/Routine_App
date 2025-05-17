@@ -3,4 +3,5 @@ from . import views
 
 urlpatterns = [
     path('create/routine/', views.RoutineApiView.as_view(), name = 'routine'),
+    # path('routine/<str>')
 ]
