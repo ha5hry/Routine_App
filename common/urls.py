@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/token-verify', TokenVerifyView.as_view(), name = 'token_verify'),
     path('api/token-blacklist', TokenBlacklistView.as_view(), name = 'token-blacklist'),
     path('api/', include('access.urls')),
+    path('api/', include('routine.urls')),
 ]
