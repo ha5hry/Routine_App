@@ -12,10 +12,10 @@ class Routine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now = True)
 
+
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title, self.id)
-            return super().save()
+        self.slug = slugify(f"{self.title}-{self.routine_id}")
+        return super().save()
 class Todo(models.Model):
     details = models.ForeignKey(Routine, on_delete=models.CASCADE, related_name='routine_details')
     activity_name = models.CharField(max_length = 100)
