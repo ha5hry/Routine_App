@@ -21,7 +21,7 @@ class TodoSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        models = models.Todo
+        model = models.Todo
         fields = ['activity_name', 'start_time', 'end_time']
     
     def create(self, validated_data):

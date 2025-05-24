@@ -21,3 +21,10 @@ class CreateRoutineAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
+    def get(self, request, routine_slug):
+        get_routine_details = Routine.objects.get(slug = routine_slug)
+        get_routine = Todo.objects.get(details = get_routine_details)
+        serializer = serializers.TodoSerializer(get_routine)
+
+        return Response(serializer.data)
