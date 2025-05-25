@@ -16,6 +16,10 @@ class RegisterApiView(APIView):
         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+class GenderApiView(APIView):
+    def get(self, request):
+        gender_choice = Profile.gender_choice
+        return Response(gender_choice)
 class SkillApiView(APIView):
     def post(self, request):
         serializer = SkillSerializer(data = request.data, context = {'request': request})
@@ -32,6 +36,7 @@ class ProfileApiView(APIView):
         no_of_followers = Follow.objects.filter(user_followed = request.user).count()
         serializer = ProfileSerializer(instance)
         return Response({'profile_data':serializer.data, 'following_data': no_of_following, 'followers_data': no_of_followers})
+
 
 class EditProfileApiView(APIView):
     permission_classes = [permissions.AccessPermission]
