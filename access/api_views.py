@@ -1,25 +1,52 @@
+import requests
+
+from django.contrib.auth import login
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import render, redirect
 from .models import Profile, Skill, Follow
 from .serializers import RegisterSerializer, SkillSerializer, ProfileSerializer, FollowSerializer
 from common import permissions
-
 # Create your views here.
 class RegisterApiView(APIView):
+
     def post(self, request):
         serializer = RegisterSerializer(data = request.data, context = {'request': request})
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+            response = Response(serializer.data, status=status.HTTP_201_CREATED)
+            response ["HX-Redirect"] = '/homepage/'
+            return response
+        else:
+            print(serializer.errors)
+            return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class GenderApiView(APIView):
-    def get(self, request):
-        gender_choice = Profile.gender_choice
-        return Response(gender_choice)
+
+class LoginApiView(APIView):
+    def post(self, request):
+        endpoints = 'http://127.0.0.1:8000/api/token/'
+        email = request.data.get('email')
+        password = request.data.get('password')
+        login_endpoint = requests.post(endpoints, json = {'email': email, 'password':password})
+        endpoint_response = login_endpoint.json()
+        print (endpoint_response)
+        if login_endpoint.status_code == 200:
+            request.session['access_tokens'] =  endpoint_response["access"]
+            request.session['refresh_tokens'] = endpoint_response["refresh"]
+            try:
+                print("enters the try block")
+                user = Profile.objects.get(email = email)
+                user_username = user.username
+                login(request, user)
+                return redirect("landing-page")
+            except ObjectDoesNotExist:
+                print("enters the except block")
+                return redirect('register_user')
+        return Response(endpoint_response)
+
 class SkillApiView(APIView):
     def post(self, request):
         serializer = SkillSerializer(data = request.data, context = {'request': request})
@@ -27,7 +54,7 @@ class SkillApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
-    
+
 class ProfileApiView(APIView):
     permission_classes =[permissions.AccessPermission]
     def get(self, request, username):
@@ -36,7 +63,6 @@ class ProfileApiView(APIView):
         no_of_followers = Follow.objects.filter(user_followed = request.user).count()
         serializer = ProfileSerializer(instance)
         return Response({'profile_data':serializer.data, 'following_data': no_of_following, 'followers_data': no_of_followers})
-
 
 class EditProfileApiView(APIView):
     permission_classes = [permissions.AccessPermission]
@@ -94,4 +120,3 @@ class FollowApiView(APIView):
         instance = Follow.objects.all()
         serializer = FollowSerializer(instance, many = True, context = {'request': request})
         return Response(serializer.data)
-
