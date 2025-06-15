@@ -26,7 +26,15 @@ class RegisterApiView(APIView):
 
 
 class LoginApiView(APIView):
+    '''Made an api which obtain the access_tokens and the refresh_tokens from the JWT api
+    - Get the the details by the user from the frontend
+    - stores the tokens in a server based session storage
+        - try block: log in te user from the request data if the email from the request is in the database and 
+        redirect to homepage using htmx header
+        - else block: if the email is not found in the database redirect to the the registration page
+    '''
     def post(self, request):
+        print("this is the beginning") 
         endpoints = 'http://127.0.0.1:8000/api/token/'
         email = request.data.get('email')
         password = request.data.get('password')
@@ -39,9 +47,8 @@ class LoginApiView(APIView):
             try:
                 print("enters the try block")
                 user = Profile.objects.get(email = email)
-                user_username = user.username
                 login(request, user)
-                return redirect("landing-page")
+                return Response(headers={'HX-Redirect': '/homepage/'})
             except ObjectDoesNotExist:
                 print("enters the except block")
                 return redirect('register_user')
