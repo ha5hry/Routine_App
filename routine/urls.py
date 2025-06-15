@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from . import api_views, views
 
 urlpatterns = [
-    path('routine/title/', views.RoutineTitleApiView.as_view(), name = 'routine_title'),
-    path('create/routine/<slug:routine_slug>/', views.CreateRoutineAPIView.as_view(), name = 'routine'),
+    path('api/routine/title/', api_views.RoutineTitleApiView.as_view(), name = 'routine_title_api'),
+    path('api/create/routine/add/<slug:routine_slug>/', api_views.RoutineTaskAPIView.as_view(), name = 'add_routine_api'),
+    path('api/create/routine/', api_views.CreateRoutineAPIView.as_view(), name = 'create_routine_api'),
 ]
