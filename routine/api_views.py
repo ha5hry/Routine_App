@@ -5,16 +5,26 @@ from .models import Routine, Todo
 from django.core.exceptions import ObjectDoesNotExist
 from . import serializers
 import requests
+from common import permissions
 # Create your views here.
 class RoutineTitleApiView(APIView):
+    permission_classes =[permissions.AccessPermission]
     def post(self, request):
         routine_details_serializer = serializers.RoutineSerializer(data = request.data, context = {'request': request})
         if routine_details_serializer.is_valid():
             routine_details_serializer.save()
             return Response(routine_details_serializer.data)
         return Response(routine_details_serializer.errors)
+    def patch(self, request, routine_slug):
+        get_routine_details = Routine.objects.get(slug=routine_slug)
+        routine_details_serializer = serializers.RoutineSerializer( get_routine_details, data = request.data, context = {'request': request}, partial = True)
+        if routine_details_serializer.is_valid():
+            routine_details_serializer.save()
+            return Response(routine_details_serializer.data)
+        return Response(routine_details_serializer.errors)
 
 class RoutineTaskAPIView(APIView):
+    permission_classes =[permissions.AccessPermission]
     def post(self, request, routine_slug):
         get_routine = Routine.objects.get(slug = routine_slug)
         serializer = serializers.TodoSerializer(data = request.data, context={'request':request, 'routine_slug': routine_slug})
@@ -23,6 +33,8 @@ class RoutineTaskAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors)
     
+
+    
     def get(self, request, routine_slug):
         get_routine_details = Routine.objects.get(slug = routine_slug)
         get_routine = Todo.objects.get(details = get_routine_details)
@@ -30,13 +42,16 @@ class RoutineTaskAPIView(APIView):
 
         return Response(serializer.data)
 
-# class MyRoutinesApiView(APIView):
-#     def get(sef, request):
-#         get_routines = Todo.objects.all(details_author = request.user)
-#         serializer = serializers.TodoSerializer(get_routines)
-#         return Response(serializers.data)
+    def patch(self, request, routine_slug):
+        get_routine = Todo.objects.get(details__slug = routine_slug)
+        serializer = serializers.TodoSerializer( get_routine, data = request.data, context={'request':request, 'routine_slug': routine_slug}, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 class CreateRoutineAPIView(APIView):
+    permission_classes =[permissions.AccessPermission]
     def post(self, request):
         # This section handles the routine details models
         access_token = request.session.get('access_tokens')
@@ -58,3 +73,42 @@ class CreateRoutineAPIView(APIView):
         todo_endpoint_json = todo_response.json()
         print(title_slug)
         return Response(headers={"HX-Redirect": "/homepage/"})
+
+class EditRoutineAPIView(APIView):
+    def post(self, request, routine_slug ):
+        form_data = request.data
+        edited_data ={}
+        for key, value in form_data.items():
+            # The If block filter out the incoming request if the value of the key are none or an empty string
+            if value is not None and value!= '':
+                # append the the key and value to the edited_data dictionary. NOTE: This are the fields the users tends to edit
+                edited_data[key] = value
+
+        try:
+            routine = Todo.objects.get(details__slug=routine_slug)
+        except ObjectDoesNotExist:
+            return Response("Routine not found")
+        else:
+            # access_token and refresh_token this get the user token from session cokes
+            access_token = request.session.get('access_tokens')
+            refresh_token = request.session.get('refresh_tokens')
+            header = {"AUTHORIZATION": f"Bearer {access_token}"}
+            edit_title_endpoint = f"http://127.0.0.1:8000/api/edit/routine/{routine_slug}/"
+
+            edit_activity_endpoint = f'http://127.0.0.1:8000/api/edit/tasks/{routine_slug}/'
+            title_keys = ['title', 'description']
+            tasks_keys= ['activity_name', 'start_time', 'end_time']
+
+            title_section_data = {}
+            tasks_section_data = {}
+            # for this for block, we need to separate the data going to the  edit_title_endpoint and  edit_activity_endpoint, separating the data by their keys
+            for key, value in edited_data.items():
+                if key in title_keys:
+                    title_section_data[key] = value
+                elif key in tasks_keys:
+                    tasks_section_data[key] = value
+                else:
+                    pass
+            title_section_data_response = requests.patch(edit_title_endpoint, json=title_section_data, headers=header)
+            tasks_section_data_response = requests.patch(edit_activity_endpoint, json=tasks_section_data, headers=header)
+        return Response({'Title Section':title_section_data_response.json(), 'task Section': tasks_section_data_response.json()})
