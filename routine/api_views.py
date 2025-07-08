@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from .models import Routine, Todo
 from django.core.exceptions import ObjectDoesNotExist
 from . import serializers
@@ -15,13 +16,20 @@ class RoutineTitleApiView(APIView):
             routine_details_serializer.save()
             return Response(routine_details_serializer.data)
         return Response(routine_details_serializer.errors)
+    
     def patch(self, request, routine_slug):
-        get_routine_details = Routine.objects.get(slug=routine_slug)
-        routine_details_serializer = serializers.RoutineSerializer( get_routine_details, data = request.data, context = {'request': request}, partial = True)
-        if routine_details_serializer.is_valid():
-            routine_details_serializer.save()
-            return Response(routine_details_serializer.data)
-        return Response(routine_details_serializer.errors)
+        try:
+            get_routine_details = Routine.objects.get(slug=routine_slug)
+        except ObjectDoesNotExist:
+            return Response({'message': "Routine can't be found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            if request.user != get_routine_details.author:
+                return Response({'message':'This can only be edited by the owner'},  status=status.HTTP_403_FORBIDDEN )
+            routine_details_serializer = serializers.RoutineSerializer( get_routine_details, data = request.data, context = {'request': request}, partial = True)
+            if routine_details_serializer.is_valid():
+                routine_details_serializer.save()
+                return Response(routine_details_serializer.data)
+            return Response(routine_details_serializer.errors)
 
 class RoutineTaskAPIView(APIView):
     permission_classes =[permissions.AccessPermission]
@@ -32,9 +40,7 @@ class RoutineTaskAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
-    
 
-    
     def get(self, request, routine_slug):
         get_routine_details = Routine.objects.get(slug = routine_slug)
         get_routine = Todo.objects.get(details = get_routine_details)
@@ -43,12 +49,31 @@ class RoutineTaskAPIView(APIView):
         return Response(serializer.data)
 
     def patch(self, request, routine_slug):
-        get_routine = Todo.objects.get(details__slug = routine_slug)
-        serializer = serializers.TodoSerializer( get_routine, data = request.data, context={'request':request, 'routine_slug': routine_slug}, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+        try:
+            get_routine = Todo.objects.get(details__slug=routine_slug)
+        except ObjectDoesNotExist:
+            return Response({'message': "Task can't be found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            if request.user != get_routine.details.author:
+                return Response({'message':'This can only be edited by the owner'},  status=status.HTTP_403_FORBIDDEN )
+            serializer = serializers.TodoSerializer( get_routine, data = request.data, context={'request':request, 'routine_slug': routine_slug}, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors)
+
+class DeleteRoutineApiView(APIView):
+    def delete(self,request, routine_slug):
+
+        try:
+            get_routine_details = Routine.objects.get(slug=routine_slug)
+        except ObjectDoesNotExist:
+            return Response({'message': "Routine can't be found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            if request.user != get_routine_details.author:
+                return Response({'message':'This can only be edited by the owner'},  status=status.HTTP_403_FORBIDDEN )
+            get_routine_details.delete()
+            return Response("Routine deleted")
 
 class CreateRoutineAPIView(APIView):
     permission_classes =[permissions.AccessPermission]
@@ -74,14 +99,15 @@ class CreateRoutineAPIView(APIView):
         print(title_slug)
         return Response(headers={"HX-Redirect": "/homepage/"})
 
-class EditRoutineAPIView(APIView):
+class EditRoutineLinkAPIView(APIView):
+
     def post(self, request, routine_slug ):
         form_data = request.data
         edited_data ={}
         for key, value in form_data.items():
             # The If block filter out the incoming request if the value of the key are none or an empty string
             if value is not None and value!= '':
-                # append the the key and value to the edited_data dictionary. NOTE: This are the fields the users tends to edit
+                # append the the key and value to the edited_data dictionary. NOTE: These are the fields the users tends to edit
                 edited_data[key] = value
 
         try:
