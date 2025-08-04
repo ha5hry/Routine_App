@@ -12,7 +12,8 @@ class Routine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now = True)
 
-
+    def __str__(self):
+       return self.title
     def save(self, *args, **kwargs):
         self.slug = slugify(f"{self.title}-{self.routine_id}")
         return super().save()

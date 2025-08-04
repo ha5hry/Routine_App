@@ -63,6 +63,7 @@ class RoutineTaskAPIView(APIView):
             return Response(serializer.errors)
 
 class DeleteRoutineApiView(APIView):
+    permission_classes = [permissions.AccessPermission]
     def delete(self,request, routine_slug):
 
         try:
@@ -138,3 +139,17 @@ class EditRoutineLinkAPIView(APIView):
             title_section_data_response = requests.patch(edit_title_endpoint, json=title_section_data, headers=header)
             tasks_section_data_response = requests.patch(edit_activity_endpoint, json=tasks_section_data, headers=header)
         return Response({'Title Section':title_section_data_response.json(), 'task Section': tasks_section_data_response.json()})
+
+class RoutinesAPIView(APIView):
+    permission_classes = [permissions.AccessPermission]
+    def get(self, request):
+        instance = Routine.objects.filter(author = request.user)
+        serializer =serializers.RoutineSerializer(instance, many = True)
+        return Response(serializer.data)
+
+class TasksAPIView(APIView):
+    permission_classes = [permissions.AccessPermission]
+    def get(self, request, routine_slug):
+        instance = Todo.objects.filter(details__slug = routine_slug)
+        serializer =serializers.TodoSerializer(instance, many = True)
+        return Response(serializer.data)

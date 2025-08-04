@@ -12,7 +12,7 @@ class RoutineConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.routine, self.channel_name)
     async def receive(self, text_data):
         # user = self.scope['user']
-        data = "This user routine has started"
+        data = json.loads(text_data)
         message = data['message']
         await self.channel_layer.group_send(
             self.routine,

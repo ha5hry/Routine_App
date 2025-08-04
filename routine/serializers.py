@@ -10,7 +10,7 @@ class RoutineSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
          request = self.context.get('request')
-         random_id = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(21))
+         random_id = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
          validated_data['author'] = request.user
          validated_data['routine_id'] =  random_id
          return super().create(validated_data)
