@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ALLOWED_HOSTS = ['routineapp-production.up.railway.app', 'localh
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
