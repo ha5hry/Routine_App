@@ -3,7 +3,7 @@ from getpass import getpass
 from register import add_skill
 
 def login():
-    endpoints = 'http://127.0.0.1:8000/api/token/'
+    endpoints = 'http://127.0.0.1:8000/api/create-token/'
     email = input("Input your email?\n")
     password = getpass("Input your password?\n")
     login_endpoint = requests.post(endpoints, json = {'email': email, 'password':password})
@@ -19,7 +19,7 @@ def login():
 
 if __name__ == '__main__':
     header = login()
-    add_skill(requests, header= header)
+    
 
 
     

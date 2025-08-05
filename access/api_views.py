@@ -8,6 +8,8 @@ from rest_framework import status
 from django.shortcuts import render, redirect
 from .models import Profile, Skill, Follow
 from .serializers import RegisterSerializer, SkillSerializer, ProfileSerializer, FollowSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
 from common import permissions
 # Create your views here.
 class RegisterApiView(APIView):
@@ -24,7 +26,8 @@ class RegisterApiView(APIView):
             print(serializer.errors)
             return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+class MyTokenObtainPairAPIView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 class LoginApiView(APIView):
     '''Made an api which obtain the access_tokens and the refresh_tokens from the JWT api
     - Get the the details by the user from the frontend
@@ -63,7 +66,6 @@ class SkillApiView(APIView):
         return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileApiView(APIView):
-    permission_classes =[permissions.AccessPermission]
     def get(self, request, username):
         instance = Profile.objects.get(username = username)
         no_of_following= Follow.objects.filter(user_following = request.user).count()
