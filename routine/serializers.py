@@ -2,11 +2,12 @@ from rest_framework import serializers
 from . import models
 import random, string
 class RoutineSerializer(serializers.ModelSerializer):
-
-
+    routine_slug = serializers.SerializerMethodField(read_only = True)
+    def get_routine_slug(self, obj):
+         return obj.slug
     class Meta:
         model = models.Routine
-        fields = ['title', 'description']
+        fields = ['title', 'description', 'routine_slug']
 
     def create(self, validated_data):
          request = self.context.get('request')
