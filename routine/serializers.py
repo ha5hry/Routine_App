@@ -19,11 +19,18 @@ class RoutineSerializer(serializers.ModelSerializer):
 class TodoSerializer(serializers.ModelSerializer):
     start_time = serializers.TimeField(format='%H:%M')
     end_time = serializers.TimeField(format='%H:%M')
+    task_author = serializers.SerializerMethodField(read_only = True)
+    task_title = serializers.SerializerMethodField (read_only = True)
 
+
+    def get_task_author(self, obj):
+        return obj.details.author.email
+    def get_task_title(self, obj):
+        return obj.details.title
 
     class Meta:
         model = models.Todo
-        fields = ['activity_name', 'start_time', 'end_time']
+        fields = ['task_title', 'task_author', 'activity_name', 'start_time', 'end_time']
     
     def create(self, validated_data):
         request = self.context.get('request')

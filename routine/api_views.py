@@ -144,8 +144,10 @@ class RoutinesAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
     def get(self, request):
         instance = Routine.objects.filter(author = request.user)
+        task_instance = Todo.objects.filter (details__author = request.user)
         serializer =serializers.RoutineSerializer(instance, many = True)
-        return Response(serializer.data)
+        task_serializer = serializers.TodoSerializer(task_instance, many=True)
+        return Response({"Title Data":serializer.data,  "task Data":task_serializer.data})
 
 class TasksAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
