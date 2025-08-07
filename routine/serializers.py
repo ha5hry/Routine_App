@@ -25,16 +25,18 @@ class TodoSerializer(serializers.ModelSerializer):
     task_author = serializers.SerializerMethodField(read_only = True)
     task_title = serializers.SerializerMethodField (read_only = True)
     task_id = serializers.SerializerMethodField(read_only=True)
-
+    routine_slug = serializers.SerializerMethodField(read_only=True)
     def get_task_author(self, obj):
         return obj.details.author.email
     def get_task_title(self, obj):
         return obj.details.title
     def get_task_id(self, obj):
         return obj.id
+    def get_routine_slug(self, obj):
+        return obj.details.slug
     class Meta:
         model = models.Todo
-        fields = ['task_id' ,'task_title', 'task_author', 'activity_name', 'start_time', 'end_time']
+        fields = ['task_id' ,'task_title','routine_slug', 'task_author', 'activity_name', 'start_time', 'end_time']
 
     def create(self, validated_data):
         request = self.context.get('request')
