@@ -76,69 +76,8 @@ class DeleteRoutineApiView(APIView):
             get_routine_details.delete()
             return Response("Routine deleted")
 
-class CreateRoutineAPIView(APIView):
-    permission_classes =[permissions.AccessPermission]
-    def post(self, request):
-        # This section handles the routine details models
-        access_token = request.session.get('access_tokens')
-        refresh_token = request.session.get('refresh_tokens')
-        title = request.data.get('title')
-        title_endpoint = 'http://127.0.0.1:8000/api/routine/title/'
-        header = {'AUTHORIZATION': f'Bearer {access_token}'}
-        data = {'title': request.data.get('title'), 'description': request.data.get('description')}
-        title_response = requests.post(title_endpoint, json=data, headers=header)
-        title_response_json = title_response.json()
-        print(title_response_json)
-        print(title_response.status_code)
 
-        # This section is for The Todos models
-        title_object = Routine.objects.get(title = title)
-        title_slug = title_object.slug
-        todo_endpoint = f'http://127.0.0.1:8000/api/create/routine/add/{title_slug}/'
-        todo_response = requests.post(todo_endpoint, json={'activity_name': request.data.get('activity_name'), 'start_time': request.data.get('start_time'), 'end_time': request.data.get('end_time')})
-        todo_endpoint_json = todo_response.json()
-        print(title_slug)
-        return Response(headers={"HX-Redirect": "/homepage/"})
 
-class EditRoutineLinkAPIView(APIView):
-
-    def post(self, request, routine_slug ):
-        form_data = request.data
-        edited_data ={}
-        for key, value in form_data.items():
-            # The If block filter out the incoming request if the value of the key are none or an empty string
-            if value is not None and value!= '':
-                # append the the key and value to the edited_data dictionary. NOTE: These are the fields the users tends to edit
-                edited_data[key] = value
-
-        try:
-            routine = Todo.objects.get(details__slug=routine_slug)
-        except ObjectDoesNotExist:
-            return Response("Routine not found")
-        else:
-            # access_token and refresh_token this get the user token from session cokes
-            access_token = request.session.get('access_tokens')
-            refresh_token = request.session.get('refresh_tokens')
-            header = {"AUTHORIZATION": f"Bearer {access_token}"}
-            edit_title_endpoint = f"http://127.0.0.1:8000/api/edit/routine/{routine_slug}/"
-
-            edit_activity_endpoint = f'http://127.0.0.1:8000/api/edit/tasks/{routine_slug}/'
-            title_keys = ['title', 'description']
-            tasks_keys= ['activity_name', 'start_time', 'end_time']
-
-            title_section_data = {}
-            tasks_section_data = {}
-            # for this for block, we need to separate the data going to the  edit_title_endpoint and  edit_activity_endpoint, separating the data by their keys
-            for key, value in edited_data.items():
-                if key in title_keys:
-                    title_section_data[key] = value
-                elif key in tasks_keys:
-                    tasks_section_data[key] = value
-                else:
-                    pass
-            title_section_data_response = requests.patch(edit_title_endpoint, json=title_section_data, headers=header)
-            tasks_section_data_response = requests.patch(edit_activity_endpoint, json=tasks_section_data, headers=header)
-        return Response({'Title Section':title_section_data_response.json(), 'task Section': tasks_section_data_response.json()})
 
 class RoutinesAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
