@@ -1,7 +1,3 @@
 {
-    "cSpell.words": [
-        "ASGI",
-        "dotenv",
-        "simplejwt"
-    ]
+  "cSpell.words": ["ASGI", "dotenv", "Myroutines", "simplejwt"]
 }

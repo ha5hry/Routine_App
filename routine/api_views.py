@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Routine, Todo
+from .models import Routine, Todo, RoutineTracker
 from django.core.exceptions import ObjectDoesNotExist
 from . import serializers
 import requests
@@ -76,17 +76,15 @@ class DeleteRoutineApiView(APIView):
             get_routine_details.delete()
             return Response("Routine deleted")
 
-
-
-
 class RoutinesAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
     def get(self, request):
         instance = Routine.objects.filter(author = request.user)
         task_instance = Todo.objects.filter (details__author = request.user)
-        serializer =serializers.RoutineSerializer(instance, many = True)
+        serializer =serializers.MyroutinesSerializer(instance, many = True)
         task_serializer = serializers.TodoSerializer(task_instance, many=True)
-        return Response({"Title Data":serializer.data,  "task Data":task_serializer.data})
+        # return Response({"Title Data":serializer.data,  "task Data":task_serializer.data})
+        return Response (serializer.data)
 
 class TasksAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
@@ -94,3 +92,19 @@ class TasksAPIView(APIView):
         instance = Todo.objects.filter(details__slug = routine_slug)
         serializer =serializers.TodoSerializer(instance, many = True)
         return Response(serializer.data)
+
+class RoutineTrackerAPIView(APIView):
+    def get(self, request, routine_slug = None):
+        routines = RoutineTracker.objects.filter( user = request.user)
+        serializer = serializers.GetRoutineTracker(routines, many = True)
+        return Response(serializer.data)
+    def post(self, request, routine_slug):
+        routine = RoutineTracker.objects.get(routine__slug=routine_slug, user = request.user)
+        if routine:
+            return Response("Already Tracking this routine", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = serializers.RoutineTrackerSerializer(data = request.data, context = {"request": request, "routine_slug":routine_slug})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)

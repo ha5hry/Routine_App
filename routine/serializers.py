@@ -44,3 +44,26 @@ class TodoSerializer(serializers.ModelSerializer):
         get_routine = models.Routine.objects.get(slug =  routine_slug)
         validated_data['details'] = get_routine
         return super().create(validated_data)
+
+class MyroutinesSerializer(serializers.ModelSerializer):
+    tasks = TodoSerializer(source="routine_details", many=True, read_only=True)
+    author = serializers.SerializerMethodField(read_only = True)
+    def get_author(self, obj):
+        return obj.author.email
+    class Meta:
+        model = models.Routine
+        fields = ["routine_id","author" ,"title", "description", "slug", "tasks"]
+
+class RoutineTrackerSerializer(serializers.ModelSerializer):
+    tasks = TodoSerializer(source = 'routine_details', many = True, read_only = True)
+
+    class Meta:
+        model = models.Routine
+        fields = ["routine_id", "title", "description", "slug", "tasks"]
+
+class GetRoutineTracker(serializers.ModelSerializer):
+    routine = RoutineTrackerSerializer(read_only=True) 
+
+    class Meta:
+        model = models.RoutineTracker
+        fields = ["routine", "user"]
