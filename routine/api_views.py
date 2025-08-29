@@ -108,3 +108,18 @@ class RoutineTrackerAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+
+class PrivacyAPIView(APIView):
+    def post(self, request, routine_slug):
+        privacy_status = Routine.objects.get(slug = routine_slug)
+        response = request.data.get("privacy", "Private")
+        small_char = response.lower()
+        if small_char == 'private':
+            privacy_status.privacy = False
+            privacy_status.save()
+        elif small_char == 'public':
+            privacy_status.privacy = True
+            privacy_status.save()
+        else:
+            return response (status.HTTP_400_BAD_REQUEST)
+        return Response (response)

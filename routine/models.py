@@ -9,6 +9,7 @@ class Routine(models.Model):
     title =  models.CharField(max_length = 50)
     description = models.TextField()
     slug = models.SlugField(unique=True, null= True, blank=False)
+    privacy = models.BooleanField(default = False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now = True)
 
