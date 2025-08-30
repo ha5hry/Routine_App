@@ -62,6 +62,11 @@ class RoutineTaskAPIView(APIView):
                 return Response(serializer.data)
             return Response(serializer.errors)
 
+class RoutinesAPIView(APIView):
+    def get(self, request):
+        instance = Routine.objects.filter(privacy = True)
+        serializer = serializers.RoutineTrackerSerializer(instance, many = True)
+        return Response(serializer.data)
 class DeleteRoutineApiView(APIView):
     permission_classes = [permissions.AccessPermission]
     def delete(self,request, routine_slug):
@@ -76,7 +81,7 @@ class DeleteRoutineApiView(APIView):
             get_routine_details.delete()
             return Response("Routine deleted")
 
-class RoutinesAPIView(APIView):
+class MyRoutinesAPIView(APIView):
     permission_classes = [permissions.AccessPermission]
     def get(self, request):
         instance = Routine.objects.filter(author = request.user)

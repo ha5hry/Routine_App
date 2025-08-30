@@ -4,7 +4,8 @@ from . import api_views
 urlpatterns = [
     path('routine/title/', api_views.RoutineTitleApiView.as_view(), name = 'routine_title_api'),
     path('create/routine/add/<slug:routine_slug>/', api_views.RoutineTaskAPIView.as_view(), name = 'add_routine_api'),
-    path('myroutines/', api_views.RoutinesAPIView.as_view(), name = 'all_routines'),
+    path('routines/', api_views.RoutinesAPIView.as_view(), name = 'routines'),
+    path('myroutines/', api_views.MyRoutinesAPIView.as_view(), name = 'my_routines'),
     path('tasks/<slug:routine_slug>/', api_views.TasksAPIView.as_view(), name = 'all_tasks'),
     path('edit/tasks/<slug:routine_slug>/', api_views.RoutineTaskAPIView.as_view(), name = 'edit_task_api'),
     path('edit/details/<slug:routine_slug>/', api_views.RoutineTitleApiView.as_view(), name = 'edit_routine_api'),
